@@ -95,15 +95,21 @@ if (!function_exists('objectToArray')) {
 if (!function_exists('generateMarks')) {
     function generateMarks($markName, $array)
     {
-        $sql = [];
+        $sql_arr = [];
         $assoc = [];
 
         foreach ($array as $index => $data) {
-            array_push($sql, ':' . $markName . '_' . $index);
+            array_push($sql_arr, ':' . $markName . '_' . $index);
             $assoc = array_merge($assoc, [$markName . '_' . $index => $data]);
         }
 
-        $sql = implode(',', $sql);
+        $chunks = array_chunk($sql_arr, 10);
+        $sql_chunk = [];
+        foreach ($chunks as $chunk) {
+            $sql_chunk[] = implode(',', $chunk) . PHP_EOL;
+        }
+
+        $sql =  PHP_EOL . implode(',', $sql_chunk);
 
         $returnData = new stdClass();
         $returnData->sql = count($assoc) > 0 ?  $sql : 'false';
@@ -129,6 +135,13 @@ if (!function_exists('createMarks')) {
         $returnData->sql = $sql;
         $returnData->assoc = $assoc;
         return $returnData;
+    }
+}
+
+if (!function_exists('char_at')) {
+    function char_at($str, $pos)
+    {
+        return $str[$pos];
     }
 }
 
