@@ -16,7 +16,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "phpoffice/phpspreadsheet": "^1.22"
+        "phpoffice/phpspreadsheet": "^1.22",
+        "barryvdh/laravel-dompdf": "^1.0"
     },
     "extra": {
         "laravel": {
