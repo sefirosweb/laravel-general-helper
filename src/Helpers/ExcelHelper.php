@@ -61,7 +61,7 @@ class ExcelHelper
 
     public function save()
     {
-        $path = $this->path ? $this->path :  pathTemp() . '/' . $this->fileName . '.xlsx';
+        $path = $this->path ? $this->path :  pathTemp() . '/' . $this->fileName . '_' . date('YmdHis')  . '.xlsx';
 
         $this->writer->save($path);
 
