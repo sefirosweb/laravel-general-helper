@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Sefirosweb\LaravelGeneralHelper\Helpers\ExcelHelper;
@@ -49,7 +48,6 @@ if (!function_exists('array_group_by')) {
     }
 }
 
-
 if (!function_exists('array_group_by_multidimensional')) {
     function array_group_by_multidimensional($array, $union_by, $onlyFirstValue = false)
     {
@@ -74,7 +72,6 @@ if (!function_exists('array_group_by_multidimensional')) {
     }
 }
 
-
 if (!function_exists('objectToArray')) {
     function objectToArray($obj)
     {
@@ -94,7 +91,6 @@ if (!function_exists('objectToArray')) {
         return $new;
     }
 }
-
 
 if (!function_exists('generateMarks')) {
     function generateMarks($markName, $array)
@@ -135,7 +131,6 @@ if (!function_exists('createMarks')) {
         return $returnData;
     }
 }
-
 
 if (!function_exists('mergeArrays')) {
     function mergeArrays($main_array, $secondary_array, $union_by, $union_first_value = false, $force_mmatch = false)
@@ -248,7 +243,6 @@ if (!function_exists('mergeArraysOnSubArray')) {
     }
 }
 
-
 if (!function_exists('query')) {
     function query($query, $marks = null, $database = false)
     {
@@ -281,7 +275,7 @@ if (!function_exists('excelToArray')) {
             }
 
             if (!in_array(strtolower($inputFileType), $filetypeAccepted)) {
-                die("Excel en formato $filetypeAccepted no soportado!");
+                throw new Exception("Excel en formato $filetypeAccepted no soportado!");
             }
 
             if (strtolower($inputFileType) === 'csv') {
@@ -454,7 +448,6 @@ if (!function_exists('saveExcelInServerAndDownload')) {
         return response()->download($savedFile->path);
     }
 }
-
 
 if (!function_exists('br2nl')) {
     function br2nl($string)
