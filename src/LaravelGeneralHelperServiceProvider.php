@@ -2,6 +2,7 @@
 
 namespace Sefirosweb\LaravelGeneralHelper;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -9,6 +10,12 @@ class LaravelGeneralHelperServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        if (File::exists(__DIR__ . '/Helpers/GeneralHelperFunctions.php')) {
+            require __DIR__ . '/Helpers/GeneralHelperFunctions.php';
+        }
+
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+
         $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'laravel-general-helper');
         $this->registerRoutes();
 
