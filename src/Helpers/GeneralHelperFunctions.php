@@ -342,22 +342,10 @@ if (!function_exists('pathTemp')) {
 }
 
 if (!function_exists('saveCsvInServerAndDownload')) {
-    function saveCsvInServerAndDownload($arrayData, $archive_file_name, $delimiter = ';', $enclosure = '"', $latingMode = false, $headers = true, $utf8_decode = false, $enclosureAll = false)
+    function saveCsvInServerAndDownload($arrayData, $fileName, $delimiter = ';', $enclosure = '"', $latingMode = false, $headers = true, $utf8_decode = false, $enclosureAll = false)
     {
-        $savedFile = saveCsvInServer($arrayData, $archive_file_name, $delimiter, $enclosure, $latingMode, $headers, $utf8_decode, $enclosureAll);
-        return Response::download($savedFile->path);
-    }
-}
-
-if (!function_exists('downloadXLSX')) {
-    function downloadXLSX($filePath, $archive_file_name)
-    {
-        header('Content-Type: application/xlsx');
-        header("Content-Disposition: attachment; filename=$archive_file_name");
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        readfile($filePath);
-        exit;
+        $savedFile = saveCsvInServer($arrayData, $fileName, $delimiter, $enclosure, $latingMode, $headers, $utf8_decode, $enclosureAll);
+        return response()->download($savedFile->path);
     }
 }
 
