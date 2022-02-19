@@ -67,7 +67,7 @@ class ExcelHelper
 
         $savedFile = new SavedFile;
         $savedFile->user()->associate(Auth::user());
-        $savedFile->file_name = $this->fileName . '.xlsx';
+        $savedFile->file_name = $this->fileName;
         $savedFile->extension = 'xlsx';
         $savedFile->path = $path;
         $savedFile->save();
