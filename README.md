@@ -1,4 +1,4 @@
-# Laravel Ggeneral Helper
+# Laravel General Helper
 
 A bundle of helpers for develop, contains method for generate excels , csv, array optimizations and more
 
