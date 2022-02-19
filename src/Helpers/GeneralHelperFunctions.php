@@ -447,6 +447,15 @@ if (!function_exists('saveExcelInServer')) {
     }
 }
 
+if (!function_exists('saveExcelInServerAndDownload')) {
+    function saveExcelInServerAndDownload($arrayData, $filename, $headers = true)
+    {
+        $savedFile = saveExcelInServer($arrayData, $filename, $headers);
+        return response()->download($savedFile->path);
+    }
+}
+
+
 if (!function_exists('br2nl')) {
     function br2nl($string)
     {
