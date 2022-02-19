@@ -321,7 +321,7 @@ if (!function_exists('excelToArray')) {
 if (!function_exists('pathTemp')) {
     function pathTemp()
     {
-        $path = storage_path('tmp/');
+        $path = storage_path('tmp');
 
         if (!File::isDirectory($path)) {
             File::makeDirectory($path, 0777, true, true);
@@ -349,7 +349,7 @@ if (!function_exists('saveCsvInServer')) {
         $path = pathTemp();
 
         $arrayData = objectToArray($arrayData);
-        $folderPath = $path . $fileName . '.csv';
+        $folderPath = $path . '/' . $fileName . '_' . date('YmdHis') . '.csv';
 
         foreach ($arrayData as $key => $row) {
             foreach ($row as $keyName => $field) {
