@@ -1,12 +1,13 @@
 <?php
 
-use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Sefirosweb\LaravelGeneralHelper\Helpers\ExcelHelper;
+use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 
 if (!function_exists('array_group_by')) {
     function array_group_by(array $array, $key = null, $onlyFirstValue = false)
@@ -450,7 +451,7 @@ if (!function_exists('validateArray')) {
 }
 
 if (!function_exists('saveExcelInServer')) {
-    function saveExcelInServer($filename, $arrayData, $headers = true)
+    function saveExcelInServer($arrayData, $filename, $headers = true)
     {
         $excel = new ExcelHelper($filename);
         $excel->addSheet($arrayData, 'Hoja1', $headers);
