@@ -20,7 +20,7 @@ class LaravelGeneralHelperServiceProvider extends ServiceProvider
         $this->registerRoutes();
 
         $this->publishes([
-            __DIR__ . '/config/config.php' => config_path('laravel-general-helper'),
+            __DIR__ . '/config/config.php' => config_path('laravel-general-helper.php'),
         ], 'config');
     }
 
