@@ -433,18 +433,18 @@ if (!function_exists('validateArray')) {
 }
 
 if (!function_exists('saveExcelInServer')) {
-    function saveExcelInServer($arrayData, $filename, $headers = true)
+    function saveExcelInServer($arrayData, $filename, $headers = true, $creator = null)
     {
-        $excel = new ExcelHelper($filename);
+        $excel = new ExcelHelper($filename, null, $creator);
         $excel->addSheet($arrayData, 'Hoja1', $headers);
         return $excel->save();
     }
 }
 
 if (!function_exists('saveExcelInServerAndDownload')) {
-    function saveExcelInServerAndDownload($arrayData, $filename, $headers = true)
+    function saveExcelInServerAndDownload($arrayData, $filename, $headers = true, $creator = null)
     {
-        $savedFile = saveExcelInServer($arrayData, $filename, $headers);
+        $savedFile = saveExcelInServer($arrayData, $filename, $headers, $creator);
         return response()->download($savedFile->path);
     }
 }

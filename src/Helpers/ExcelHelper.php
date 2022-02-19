@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ExcelHelper
 {
-    public function __construct($fileName, $path = null, $creators = null)
+    public function __construct($fileName, $path = null, $creator = null)
     {
         $this->fileName = $fileName;
         $this->path = $path;
@@ -23,10 +23,10 @@ class ExcelHelper
         );
         $this->spreadsheet->removeSheetByIndex($sheetIndex);
 
-        if ($creators) {
+        if ($creator) {
             $this->spreadsheet->getProperties()
-                ->setCreator($creators)
-                ->setLastModifiedBy($creators);
+                ->setCreator($creator)
+                ->setLastModifiedBy($creator);
         }
 
         $this->writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
