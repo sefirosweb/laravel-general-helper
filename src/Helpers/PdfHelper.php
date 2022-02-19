@@ -30,7 +30,7 @@ class PdfHelper
 
     public function save($filename, $path = null)
     {
-        $path = $path ? $path : pathTemp() . '/' . $filename . '.pdf';
+        $path = $path ? $path : pathTemp() . '/' . $filename . '_' . date('YmdHis') . '.pdf';
 
         $this->pdf->save($path);
 
