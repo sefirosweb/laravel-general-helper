@@ -1,0 +1,26 @@
+{
+    "name": "sefirosweb/laravel-general-helper",
+    "description": "A bundle of helpers for develop, contains method for generate excels , csv, array optimizations and more",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Sefirosweb\\LaravelGeneralHelper\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sefirosweb",
+            "email": "sefirosweb@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sefirosweb\\LaravelGeneralHelper\\LaravelGeneralHelperServiceProvider"
+            ]
+        }
+    }
+}
