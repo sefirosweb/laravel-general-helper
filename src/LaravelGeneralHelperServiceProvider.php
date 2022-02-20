@@ -2,9 +2,11 @@
 
 namespace Sefirosweb\LaravelGeneralHelper;
 
-use Illuminate\Support\Facades\File;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\File;
+use Sefirosweb\LaravelGeneralHelper\Commands\RemoveTempFiles;
 
 class LaravelGeneralHelperServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,18 @@ class LaravelGeneralHelperServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config/config.php' => config_path('laravel-general-helper.php'),
         ], 'config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                RemoveTempFiles::class,
+            ]);
+        }
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('purge:temp')->cron('* * * * *')
+                ->runInBackground();
+        });
     }
 
 
