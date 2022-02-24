@@ -11,11 +11,17 @@ class PdfHelper
     public function __construct()
     {
         $this->pdf = app('dompdf.wrapper');
+        $this->set_option("enable_php", true);
     }
 
     public function loadView($view, $data = [])
     {
         $this->pdf->loadView($view, $data);
+    }
+
+    public function set_option($option, $value)
+    {
+        $this->pdf->getDomPDF()->set_option($option, $value);
     }
 
     public function setPaper($type, $direction)
