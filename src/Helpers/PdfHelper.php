@@ -18,14 +18,19 @@ class PdfHelper
         $this->pdf->loadView($view, $data);
     }
 
+    public function setPaper($type, $direction)
+    {
+        $this->pdf->setPaper($type, $direction);
+    }
+
     public function download($filename)
     {
         return $this->pdf->download($filename . '.pdf');
     }
 
-    public function showFile()
+    public function showFile($name = '')
     {
-        return $this->pdf->stream();
+        return $this->pdf->stream($name);
     }
 
     public function save($filename, $path = null)
