@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Pack;
+use App\Models\PackCombination;
+use App\Productos;
+use App\Productos_base;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -513,5 +517,28 @@ if (!function_exists('eliminar_tildes')) {
         );
 
         return $cadena;
+    }
+}
+
+if (!function_exists('valid_sku_base')) {
+    function valid_sku_base($sku_base)
+    {
+        if (
+            Productos_base::where('sku_base', '=', $sku_base)->exists() || Pack::where('sku_base', '=', $sku_base)->exists()
+            || PackCombination::where('sku', '=', $sku_base)->exists() || Productos::where('sku', '=', $sku_base)->exists()
+        ) {
+            return false;
+        }
+        return true;
+    }
+}
+
+if (!function_exists('combinacion_sku_existente')) {
+    function valid_sku_combination($sku)
+    {
+        if (Productos::where('sku', '=', $sku)->exists() || PackCombination::where('sku', '=', $sku)->exists()) {
+            return false;
+        }
+        return true;
     }
 }
