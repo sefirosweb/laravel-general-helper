@@ -33,8 +33,8 @@ class LaravelGeneralHelperServiceProvider extends ServiceProvider
 
         $this->app->booted(function () {
             $schedule = $this->app->make(Schedule::class);
-            $schedule->command('purge:temp')->cron('* * * * *')
-                ->runInBackground();
+            // $schedule->command('purge:temp')->cron('* * * * *')
+            //     ->runInBackground();
         });
     }
 
