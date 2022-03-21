@@ -3,14 +3,14 @@
 namespace Sefirosweb\LaravelGeneralHelper\Helpers;
 
 use Exception;
-use Illuminate\Support\Facades\Redis as FacadesRedis;
+use Illuminate\Support\Facades\Redis;
 
-class Redis
+class RedisHelper
 {
     static function set($key, $value, $EX = 86400)
     {
         try {
-            FacadesRedis::set($key, json_encode($value), 'EX', $EX);
+            Redis::set($key, json_encode($value), 'EX', $EX);
         } catch (Exception $e) {
             return null;
         }
@@ -19,7 +19,7 @@ class Redis
     static function publish($channel_name, $publish)
     {
         try {
-            return FacadesRedis::publish($channel_name, json_encode($publish));
+            return Redis::publish($channel_name, json_encode($publish));
         } catch (Exception $e) {
             return null;
         }
@@ -28,7 +28,7 @@ class Redis
     static function get($key)
     {
         try {
-            $data = FacadesRedis::get($key);
+            $data = Redis::get($key);
             if (!$data) {
                 return null;
             }
@@ -40,7 +40,7 @@ class Redis
 
     static function delete($key)
     {
-        return FacadesRedis::del($key);
+        return Redis::del($key);
     }
 
     static  function objectToArray($obj)
