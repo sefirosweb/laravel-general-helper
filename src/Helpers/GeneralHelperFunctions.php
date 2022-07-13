@@ -356,6 +356,18 @@ if (!function_exists('saveCsvInServerAndDownload')) {
     }
 }
 
+if (!function_exists('encodeFunc')) {
+    function encodeFunc($value)
+    {
+        ///remove any ESCAPED double quotes within string.
+        $value = str_replace('\\"', '"', $value);
+        //then force escape these same double quotes And Any UNESCAPED Ones.
+        $value = str_replace('"', '\"', $value);
+        //force wrap value in quotes and return
+        return '"' . $value . '"';
+    }
+}
+
 if (!function_exists('saveCsvInServer')) {
     function saveCsvInServer($arrayData, $fileName, $delimiter = ';', $enclosure = '"', $latingMode = false, $headers = true, $utf8_decode = false, $enclosureAll = false)
     {
@@ -459,6 +471,46 @@ if (!function_exists('saveExcelInServerAndDownload')) {
     {
         $savedFile = saveExcelInServer($arrayData, $filename, $headers, $creator);
         return response()->download($savedFile->path);
+    }
+}
+
+
+if (!function_exists('saveZipInServerAndDownload')) {
+    function saveZipInServerAndDownload($files, $fileName)
+    {
+        $savedFile = savingZipInServer($files, $fileName);
+        return response()->download($savedFile->path);
+    }
+}
+
+if (!function_exists('savingZipInServer')) {
+    function savingZipInServer($files, $fileName)
+    {
+        $path = pathTemp();
+
+        $fileWithPath = $path . '/' . $fileName . '_' . date('YmdHis') . '.zip';
+        if (file_exists($fileWithPath)) {
+            unlink($fileWithPath);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($fileWithPath, ZIPARCHIVE::CREATE) !== TRUE) {
+            exit("cannot open < $fileWithPath>\n");
+        }
+
+        foreach ($files as $file) {
+            $zip->addFile($file, basename($file));
+        }
+        $zip->close();
+
+        $savedFile = new SavedFile();
+        $savedFile->user()->associate(Auth::user());
+        $savedFile->file_name = $fileName;
+        $savedFile->extension = 'zip';
+        $savedFile->path = $fileWithPath;
+        $savedFile->save();
+
+        return $savedFile;
     }
 }
 
