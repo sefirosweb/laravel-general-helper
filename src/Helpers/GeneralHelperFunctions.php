@@ -495,11 +495,15 @@ if (!function_exists('savingZipInServer')) {
 
         $zip = new ZipArchive();
         if ($zip->open($fileWithPath, ZIPARCHIVE::CREATE) !== TRUE) {
-            exit("cannot open < $fileWithPath>\n");
+            throw new Exception("cannot open < $fileWithPath>\n");
         }
 
         foreach ($files as $file) {
-            $zip->addFile($file, basename($file));
+            if (is_dir($file)) {
+                addFolderToZip($zip, $file);
+            } else {
+                $zip->addFile($file, basename($file));
+            }
         }
         $zip->close();
 
@@ -511,6 +515,33 @@ if (!function_exists('savingZipInServer')) {
         $savedFile->save();
 
         return $savedFile;
+    }
+}
+
+if (!function_exists('addFolderToZip')) {
+    function addFolderToZip(ZipArchive $zip, $folder)
+    {
+        // Get real path for our folder
+        $rootPath = realpath($folder);
+
+        // Create recursive directory iterator
+        /** @var SplFileInfo[] $files */
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($rootPath),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $name => $file) {
+            // Skip directories (they would be added automatically)
+            if (!$file->isDir()) {
+                // Get real and relative path for current file
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($rootPath) + 1);
+
+                // Add current file to archive
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
     }
 }
 
