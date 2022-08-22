@@ -3,6 +3,7 @@
 namespace Sefirosweb\LaravelGeneralHelper\Http\Models;
 
 use App\Models\User as ModelsUser;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends ModelsUser
 {
@@ -11,7 +12,7 @@ class User extends ModelsUser
         parent::__construct($attributes);
     }
 
-    public function saved_files()
+    public function saved_files(): BelongsToMany
     {
         return $this->belongsToMany(SavedFile::class);
     }

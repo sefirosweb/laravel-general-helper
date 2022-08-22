@@ -3,6 +3,7 @@
 namespace Sefirosweb\LaravelGeneralHelper\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SavedFile extends Model
 {
@@ -15,7 +16,7 @@ class SavedFile extends Model
         'id', 'user_id', 'file_name', 'extension', 'path'
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
