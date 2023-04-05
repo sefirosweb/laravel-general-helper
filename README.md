@@ -43,9 +43,18 @@ php artisan vendor:publish --provider="Sefirosweb\LaravelGeneralHelper\LaravelGe
 - [br2nl](#br2nl)
 - [eliminar_tildes](#eliminar_tildes)
 
+**Helper class**
+- [RequestCache](#RequestCache)
+- [RedisHelper](#RedisHelper)
+
+## Helpers
 ### pathTemp
 
 Obtain and create the path "tmp" if it does not exist, it is created automatically, in this path the temporary files used for this package are stored
+```php
+$path = pathTemp();
+// $path = /var/www/html/storage/tmp
+```
 
 ### array_group_by
 
@@ -185,23 +194,35 @@ $arrayAgrouped = array_group_by_multidimensional($array, ['name','date'], true);
 ### objectToArray
 
 Convert stdClass object to full array values, it is required for use the array group functions
+```php
+$var = new stdClass();
+$var->field = 5;
+
+$array = objectToArray(object $var);
+// $array = [
+//     'field' => 5;
+// ]
+
+```
 
 ### generateMarks
-
+`TODO`
 ### createMarks
-
+`TODO`
 ### char_at
-
+`TODO`
+### validateArray
+`TODO`
 ### mergeArrays
-
+`TODO`
 ### mergeArraysOnSubArray
-
+`TODO`
 ### query
-
+`TODO`
 ### excelToArray
-
+`TODO`
 ### saveCsvInServerAndDownload
-
+`TODO`
 ### saveCsvInServer
 
 Function for save an structured array data into csv, and returns a object "FileSaved"
@@ -232,8 +253,6 @@ $file->path
 
 ```
 
-### validateArray
-
 ### saveExcelInServer
 
 Function for save an structured array data into excel (for huge data is recommended CSV, save data in excel have low performance)
@@ -262,11 +281,60 @@ $file->path
 ```
 
 ### saveExcelInServerAndDownload
+`TODO`
 
 ### br2nl
 
 Replace \<br> into new lines "\n"
-
+```php
+$resultString = br2nl('hello<br>world');
+// $resultString = 'hello\nworld'
+```
 ### eliminar_tildes
 
 Function for remove the latin characters "á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'" into "a / A"
+```php
+$resultString = eliminar_tildes('Camión');
+// $resultString = 'Camion'
+```
+
+## Helper class
+### RequestCache
+Store in memory for the **current request** some data, this can be stored and retrieved from any code of your app, usefull to avoid execute multiple queries and don't want to store in some cache system
+
+```php
+// Store data
+CacheRequest::set('anyKey', $anyData);
+
+// Retrieve data
+$retrieveData = CacheRequest::get('anyKey');
+
+// Hot cache data from function, if key not exists then execute the function to generate them
+$retrieveData = CacheRequest::remember('anyKey', function () {
+    // .. do something
+    return 'return any data';
+});
+
+// Delete cache
+CacheRequest::delete('anyKey');
+```
+
+### RedisHelper
+Similar to RequestCache, but ther store data in to Redis cache system:
+
+```php
+// Store data
+RedisHelper::set('anyKey', $anyData, $timeout);
+
+// Retrieve datacall($function, $key = '', $prod = false, $EX = 86400)
+$retrieveData = RedisHelper::get('anyKey');
+
+// Hot cache data from function, if key not exists then execute the function to generate them, for default is not executed in production
+$retrieveData = RedisHelper::call(function(){
+    // .. do something
+    return 'return any data';
+}, 'anyKey', $executeInProduction, $timeout);
+
+// Delete cache
+RedisHelper::delete('anyKey')
+```
