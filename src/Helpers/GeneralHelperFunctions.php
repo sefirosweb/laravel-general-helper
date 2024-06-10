@@ -11,18 +11,16 @@ use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 if (!function_exists('array_group_by')) {
     function array_group_by(array $array, $key = null, $onlyFirstValue = false)
     {
-        if (!is_string($key) && !is_int($key) && !is_float($key) && !is_callable($key)) {
+        if (!is_string($key) && !is_int($key) && !is_float($key)) {
             trigger_error('array_group_by(): The key should be a string, an integer, or a callback', E_USER_ERROR);
             return null;
         }
-        $func = (is_callable($key) ? $key : null);
+        
         $_key = $key;
         // Load the new array, splitting by the target key
         $grouped = [];
         foreach ($array as $value) {
-            if (is_callable($func)) {
-                $key = call_user_func($func, $value);
-            } elseif (is_object($value) && isset($value->{$_key})) {
+            if (is_object($value) && isset($value->{$_key})) {
                 $key = $value->{$_key};
             } elseif (isset($value[$_key])) {
                 $key = $value[$_key];
