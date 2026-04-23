@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sefirosweb\LaravelGeneralHelper\Tests\Feature;
 
 use Illuminate\Support\Facades\View;

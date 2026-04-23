@@ -4,34 +4,37 @@ namespace Sefirosweb\LaravelGeneralHelper\Helpers;
 
 class CacheRequest
 {
-    private static $cache;
+    private static array $cache = [];
 
-    public static function set($key, $value)
+    public static function set(string $key, mixed $value): void
     {
         self::$cache[$key] = $value;
     }
 
-    public static function get($key)
+    public static function get(string $key): mixed
     {
-        if (isset(self::$cache[$key])) return self::$cache[$key];
-        return null;
+        return self::$cache[$key] ?? null;
     }
 
-    public static function delete($key)
+    public static function delete(string $key): void
     {
-        if (isset(self::$cache[$key])) {
-            unset(self::$cache[$key]);
-        }
+        unset(self::$cache[$key]);
     }
 
-    public static function remember($key, $cb)
+    public static function remember(string $key, callable $cb): mixed
     {
-        if (isset(self::$cache[$key])) return self::$cache[$key];
-
-        if (is_callable($cb)) {
-            $data = call_user_func($cb);
-            self::set($key, $data);
-            return $data;
+        if (array_key_exists($key, self::$cache)) {
+            return self::$cache[$key];
         }
+
+        $data = $cb();
+        self::set($key, $data);
+
+        return $data;
+    }
+
+    public static function flush(): void
+    {
+        self::$cache = [];
     }
 }

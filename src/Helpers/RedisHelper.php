@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Redis;
 
 class RedisHelper
 {
-    static function set($key, $value, $EX = 86400)
+    public static function set(string $key, mixed $value, int $EX = 86400): void
     {
         try {
             Redis::set($key, json_encode($value), 'EX', $EX);
         } catch (Exception $e) {
-            return null;
+            // swallow: caller cannot recover if redis is down
         }
     }
 
-    static function publish($channel_name, $publish)
+    public static function publish(string $channel_name, mixed $publish): mixed
     {
         try {
             return Redis::publish($channel_name, json_encode($publish));
@@ -25,7 +25,7 @@ class RedisHelper
         }
     }
 
-    static function get($key)
+    public static function get(string $key): mixed
     {
         try {
             $data = Redis::get($key);
@@ -35,48 +35,44 @@ class RedisHelper
         } catch (Exception $e) {
             return null;
         }
+
         return self::objectToArray(json_decode($data));
     }
 
-    static function delete($key)
+    public static function delete(string $key): mixed
     {
         return Redis::del($key);
     }
 
-    static  function objectToArray($obj)
+    public static function objectToArray(mixed $obj): mixed
     {
         if (is_object($obj)) {
-            $obj = (array)$obj;
+            $obj = (array) $obj;
         }
 
         if (is_array($obj)) {
-            $new = array();
+            $new = [];
             foreach ($obj as $key => $val) {
                 $new[$key] = self::objectToArray($val);
             }
-        } else {
-            $new = $obj;
+            return $new;
         }
 
-        return $new;
+        return $obj;
     }
 
-    static function call($function, $key = '', $prod = false, $EX = 86400)
+    public static function call(callable $function, string $key = '', bool $prod = false, int $EX = 86400): mixed
     {
-        if (
-            (config('app.env') === 'local' || $prod === true)
-            &&
-            $data = self::get($key)
-        ) {
-            return $data;
+        if (config('app.env') === 'local' || $prod === true) {
+            $cached = self::get($key);
+            if ($cached !== null) {
+                return $cached;
+            }
         }
 
-        if (is_callable($function)) {
-            $data = call_user_func($function);
-            self::set($key, $data, $EX);
-            return self::objectToArray($data);
-        }
+        $data = $function();
+        self::set($key, $data, $EX);
 
-        return null;
+        return self::objectToArray($data);
     }
 }

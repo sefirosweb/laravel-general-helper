@@ -3,65 +3,82 @@
 namespace Sefirosweb\LaravelGeneralHelper\Helpers;
 
 use Exception;
-use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Settings;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 
 class ExcelHelper
 {
-    public function __construct($fileName, $path = null, $creator = null)
+    protected string $fileName;
+
+    protected ?string $path;
+
+    protected Spreadsheet $spreadsheet;
+
+    protected Xlsx $writer;
+
+    public function __construct(string $fileName, ?string $path = null, ?string $creator = null)
     {
         $this->fileName = $fileName;
         $this->path = $path;
 
         $locale = 'es';
-        $validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
-        if (!$validLocale) throw new Exception('Unable to set locale to ' . $locale);
+        if (!Settings::setLocale($locale)) {
+            throw new Exception('Unable to set locale to ' . $locale);
+        }
 
-        $this->spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $this->spreadsheet = new Spreadsheet();
         $sheetIndex = $this->spreadsheet->getIndex(
             $this->spreadsheet->getSheetByName('Worksheet')
         );
         $this->spreadsheet->removeSheetByIndex($sheetIndex);
 
-        if ($creator) {
+        if ($creator !== null) {
             $this->spreadsheet->getProperties()
                 ->setCreator($creator)
                 ->setLastModifiedBy($creator);
         }
 
-        $this->writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+        $this->writer = new Xlsx($this->spreadsheet);
     }
 
-    public function addSheet($arrayData, $sheetName, $headers = true)
+    public function addSheet(iterable $arrayData, string $sheetName, bool $headers = true): void
     {
-        $sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($this->spreadsheet, $sheetName);
+        $sheet = new Worksheet($this->spreadsheet, $sheetName);
         $arrayData = objectToArray($arrayData);
         $row = 1;
 
         if ($headers) {
             $firstData = current($arrayData);
-            $col = 1;
-            foreach ($firstData as $header => $value) {
-                $sheet->setCellValueByColumnAndRow($col, $row, $header);
-                $col++;
+            if ($firstData !== false) {
+                $col = 1;
+                foreach ($firstData as $header => $value) {
+                    $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, $header);
+                    $col++;
+                }
+                $row++;
             }
-            $row++;
         }
 
         foreach ($arrayData as $field) {
             $col = 1;
             foreach ($field as $value) {
-                $sheet->setCellValueByColumnAndRow($col, $row, $value);
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($col) . $row, $value);
                 $col++;
             }
             $row++;
         }
+
         $this->spreadsheet->addSheet($sheet);
     }
 
-    public function save()
+    public function save(): SavedFile
     {
-        $path = $this->path ? $this->path :  pathTemp() . '/' . $this->fileName . '_' . date('YmdHis')  . '.xlsx';
+        $path = $this->path ?: pathTemp() . '/' . $this->fileName . '_' . uniqid('', true) . '.xlsx';
 
         $this->writer->save($path);
 
@@ -71,6 +88,7 @@ class ExcelHelper
         $savedFile->extension = 'xlsx';
         $savedFile->path = $path;
         $savedFile->save();
+
         return $savedFile;
     }
 }

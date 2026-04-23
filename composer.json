@@ -11,7 +11,10 @@
     "autoload-dev": {
         "psr-4": {
             "Sefirosweb\\LaravelGeneralHelper\\Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "tests/Fixtures"
+        ]
     },
     "authors": [
         {
@@ -23,7 +26,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-        "phpoffice/phpspreadsheet": "^1.28",
+        "phpoffice/phpspreadsheet": "^3.0",
         "barryvdh/laravel-dompdf": "^3.0"
     },
     "require-dev": {

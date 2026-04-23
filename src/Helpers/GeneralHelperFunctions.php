@@ -279,55 +279,50 @@ if (!function_exists('excelToArray')) {
     {
         $filetypeAccepted = ['csv', 'xls', 'xlsx'];
 
-        try {
-            $inputFileType = IOFactory::identify($filePath);
-            $objReader = IOFactory::createReader($inputFileType);
+        $inputFileType = IOFactory::identify($filePath);
 
-            if ($encode) {
-                $objReader->setInputEncoding($encode);
-            }
-
-            if (!in_array(strtolower($inputFileType), $filetypeAccepted)) {
-                throw new Exception("Excel en formato $filetypeAccepted no soportado!");
-            }
-
-            if (strtolower($inputFileType) === 'csv') {
-                $objReader->setDelimiter(';');
-            }
-
-            $objPHPExcel = $objReader->load($filePath);
-            $arrayData = $objPHPExcel->getSheet(0)->toArray();
-            $arrayData = array_filter($arrayData, function ($row) {
-                $allRowIsNotNull = false;
-                foreach ($row as $value) {
-                    if (!is_null($value)) {
-                        $allRowIsNotNull = true;
-                        break;
-                    }
-                }
-                return $allRowIsNotNull;
-            });
-
-
-            //Creating an assoc array using $arrayData
-            $assoc_array = array();
-            $headers = count($arrayData[0]);
-
-            for ($i = 1; $i < count($arrayData); $i++) {
-                if (!isset($arrayData[$i])) continue;
-                $temp = array();
-                for ($y = 0; $y < ($headers); $y++) {
-                    $header_name = $arrayData[0][$y];
-                    $temp[$header_name] = is_null($arrayData[$i][$y]) ? null : $arrayData[$i][$y];
-                }
-                $assoc_array[] = $temp;
-            }
-
-            return $assoc_array;
-        } catch (Exception $e) {
-            print_r($e);
-            exit;
+        if (!in_array(strtolower($inputFileType), $filetypeAccepted, true)) {
+            throw new Exception("Excel format {$inputFileType} not supported. Accepted: " . implode(', ', $filetypeAccepted));
         }
+
+        $objReader = IOFactory::createReader($inputFileType);
+
+        if ($encode) {
+            $objReader->setInputEncoding($encode);
+        }
+
+        if (strtolower($inputFileType) === 'csv') {
+            $objReader->setDelimiter(';');
+        }
+
+        $objPHPExcel = $objReader->load($filePath);
+        $arrayData = $objPHPExcel->getSheet(0)->toArray();
+        $arrayData = array_values(array_filter($arrayData, function ($row) {
+            foreach ($row as $value) {
+                if (!is_null($value)) {
+                    return true;
+                }
+            }
+            return false;
+        }));
+
+        if (empty($arrayData)) {
+            return [];
+        }
+
+        $headers = count($arrayData[0]);
+        $assoc_array = [];
+
+        for ($i = 1, $n = count($arrayData); $i < $n; $i++) {
+            $temp = [];
+            for ($y = 0; $y < $headers; $y++) {
+                $header_name = $arrayData[0][$y];
+                $temp[$header_name] = $arrayData[$i][$y] ?? null;
+            }
+            $assoc_array[] = $temp;
+        }
+
+        return $assoc_array;
     }
 }
 
@@ -374,7 +369,7 @@ if (!function_exists('saveCsvInServer')) {
         $path = pathTemp();
 
         $arrayData = objectToArray($arrayData);
-        $folderPath = $path . '/' . $fileName . '_' . date('YmdHis') . '.csv';
+        $folderPath = $path . '/' . $fileName . '_' . uniqid('', true) . '.csv';
 
         foreach ($arrayData as $key => $row) {
             foreach ($row as $keyName => $field) {
@@ -385,10 +380,11 @@ if (!function_exists('saveCsvInServer')) {
         }
 
         if ($utf8_decode) {
-
             foreach ($arrayData as $keyArray => $row) {
                 foreach ($row as $keyData => $data) {
-                    $arrayData[$keyArray][$keyData] = utf8_decode($data);
+                    $arrayData[$keyArray][$keyData] = $data === null
+                        ? null
+                        : mb_convert_encoding((string) $data, 'ISO-8859-1', 'UTF-8');
                 }
             }
         }
@@ -488,7 +484,7 @@ if (!function_exists('savingZipInServer')) {
     {
         $path = pathTemp();
 
-        $fileWithPath = $path . '/' . $fileName . '_' . date('YmdHis') . '.zip';
+        $fileWithPath = $path . '/' . $fileName . '_' . uniqid('', true) . '.zip';
         if (file_exists($fileWithPath)) {
             unlink($fileWithPath);
         }
