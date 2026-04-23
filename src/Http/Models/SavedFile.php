@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sefirosweb\LaravelGeneralHelper\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
