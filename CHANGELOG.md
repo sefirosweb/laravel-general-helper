@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.0.2] - 2026-04-23
+
+### Added
+- **`ExcelHelper::getSpreadsheet(): Spreadsheet`** and **`ExcelHelper::getWriter(): Xlsx`** accessors. Restores the public-access contract of v12.0.0 after an unintended breaking change in v12.0.1 (see Fixed below).
+
+### Fixed
+- **Breaking-change regression from v12.0.1**: when `ExcelHelper`'s properties were tightened from dynamic (implicitly public) to declared as **`protected`**, consumer code that reached into the spreadsheet — for example `$excel->spreadsheet->getActiveSheet()` to apply formatting the helper does not wrap — started throwing visibility errors. The `getSpreadsheet()` getter restores that extensibility. Callers should migrate from `$excel->spreadsheet->…` to `$excel->getSpreadsheet()->…`; the property itself stays `protected` on purpose (encapsulation).
+
+### Changed
+- Enabled `declare(strict_types=1);` on every PHP file under `src/`. Notable given this package has the broadest public API (global helper functions + `ExcelHelper` / `PdfHelper` / `CacheRequest` / `RedisHelper` classes). Tests (56/109) pass unchanged.
+
 ## [12.0.1] - 2026-04-23
 
 ### Changed

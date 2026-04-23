@@ -48,6 +48,29 @@ class ExcelHelper
         $this->writer = new Xlsx($this->spreadsheet);
     }
 
+    /**
+     * Accessor for the underlying PhpSpreadsheet object so callers can reach
+     * APIs that this helper does not wrap — e.g. applying cell formatting,
+     * editing an existing worksheet, reading the active sheet back, etc.
+     *
+     * Restores the public access contract of v12.0.0 (where $spreadsheet was
+     * a dynamic, implicitly-public property) after v12.0.1 tightened it to a
+     * typed protected property.
+     */
+    public function getSpreadsheet(): Spreadsheet
+    {
+        return $this->spreadsheet;
+    }
+
+    /**
+     * Accessor for the underlying PhpSpreadsheet Xlsx writer. Same rationale
+     * as {@see self::getSpreadsheet()}.
+     */
+    public function getWriter(): Xlsx
+    {
+        return $this->writer;
+    }
+
     public function addSheet(iterable $arrayData, string $sheetName, bool $headers = true): void
     {
         $sheet = new Worksheet($this->spreadsheet, $sheetName);

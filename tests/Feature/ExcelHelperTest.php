@@ -76,6 +76,49 @@ class ExcelHelperTest extends TestCase
         $this->assertSame('d', $sheet->getCell('B2')->getValue());
     }
 
+    public function test_getSpreadsheet_exposes_the_underlying_spreadsheet_instance(): void
+    {
+        // Regression: v12.0.1 accidentally changed $spreadsheet from a dynamic
+        // (public-by-default) property to a typed protected one, breaking any
+        // caller doing `$excel->spreadsheet->getActiveSheet()`. The getter
+        // restores the access contract.
+        Auth::shouldReceive('user')->andReturn(null);
+
+        $helper = new ExcelHelper('accessor');
+        $spreadsheet = $helper->getSpreadsheet();
+
+        $this->assertInstanceOf(\PhpOffice\PhpSpreadsheet\Spreadsheet::class, $spreadsheet);
+
+        // Mutating through the accessor must reach the internal state that
+        // save() flushes.
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('ManuallyAdded');
+        $sheet->setCellValue('A1', 'from-outside');
+
+        $target = storage_path('tmp/accessor-' . uniqid('', true) . '.xlsx');
+        File::ensureDirectoryExists(dirname($target));
+
+        $helper = new ExcelHelper('accessor_save', $target);
+        $helper->getSpreadsheet()->createSheet()->setTitle('Injected');
+        $helper->save();
+
+        $read = \PhpOffice\PhpSpreadsheet\IOFactory::load($target);
+        $this->assertNotNull(
+            $read->getSheetByName('Injected'),
+            'A sheet added via getSpreadsheet() should end up in the written file',
+        );
+    }
+
+    public function test_getWriter_exposes_the_underlying_xlsx_writer(): void
+    {
+        Auth::shouldReceive('user')->andReturn(null);
+
+        $helper = new ExcelHelper('writer_accessor');
+        $writer = $helper->getWriter();
+
+        $this->assertInstanceOf(\PhpOffice\PhpSpreadsheet\Writer\Xlsx::class, $writer);
+    }
+
     public function test_throws_if_file_name_collides_no_longer_using_date_based_names(): void
     {
         // Two rapid-fire saves to the default temp path must produce two distinct files
