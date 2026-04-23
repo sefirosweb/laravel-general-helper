@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [12.0.3] - 2026-04-23
+
+### Fixed
+- **`purge:temp` command broke in PHP 8.x runtime** because of two implicit `SplFileInfo` → string coercions that PHP 8 no longer allows:
+  - `pathinfo($file)` now uses `$file->getBasename('.' . $file->getExtension())`.
+  - `unlink($file['file'])` now uses `$file['file']->getPathname()`.
+- Switched the age check from `$file->getCTime()` to `$file->getMTime()`. ctime tracks inode metadata (permissions/ownership), not content age; mtime is the conventional "how old is this file" signal and matches what the cleanup intent actually is.
+- `fopen()` calls in `pathTemp()` and `saveCsvInServer()` now throw an `Exception` on failure instead of passing `false` to subsequent `fwrite()` / `fputcsv()` and producing a silent no-op.
+
+### Changed
+- Native return types on all `PdfHelper` methods (`loadView`, `set_option`, `setPaper`, `download`, `showFile`, `save`).
+- Cleaner output in `RemoveTempFiles`: uses `$this->line()` instead of raw `echo`, and returns `self::SUCCESS`.
+- Removed an unused `App\Models\User` import from `RemoveTempFiles`.
+
+### Added
+- `tests/Feature/RemoveTempFilesCommandTest.php` — 4 tests covering empty temp dir, local-env behavior, and production-env age-based filtering. Caught the two SplFileInfo coercion bugs above.
+
 ## [12.0.2] - 2026-04-23
 
 ### Added

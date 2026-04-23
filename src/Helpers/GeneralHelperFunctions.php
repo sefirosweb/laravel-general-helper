@@ -336,6 +336,9 @@ if (!function_exists('pathTemp')) {
         if (!File::isDirectory($path)) {
             File::makeDirectory($path, 0777, true, true);
             $fp = fopen($path . '/.gitignore', 'w');
+            if ($fp === false) {
+                throw new Exception("pathTemp(): unable to create .gitignore inside {$path}");
+            }
             fwrite($fp, "*" . PHP_EOL);
             fwrite($fp, "!.gitignore" . PHP_EOL);
             fclose($fp);
@@ -392,6 +395,9 @@ if (!function_exists('saveCsvInServer')) {
         }
 
         $fp = fopen($folderPath, 'w');
+        if ($fp === false) {
+            throw new Exception("saveCsvInServer(): unable to open {$folderPath} for writing");
+        }
 
         if (isset($arrayData[0])) {
             if ($latingMode === true) {

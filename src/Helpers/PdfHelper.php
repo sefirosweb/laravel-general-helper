@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Sefirosweb\LaravelGeneralHelper\Helpers;
 
 use Barryvdh\DomPDF\PDF as DomPdfWrapper;
-use Exception;
+use Illuminate\Http\Response;
 use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PdfHelper
 {
@@ -16,35 +17,35 @@ class PdfHelper
     public function __construct()
     {
         $this->pdf = app('dompdf.wrapper');
-        $this->set_option("enable_php", true);
+        $this->set_option('enable_php', true);
     }
 
-    public function loadView($view, $data = [])
+    public function loadView(string $view, array $data = []): void
     {
         $this->pdf->loadView($view, $data);
     }
 
-    public function set_option($option, $value)
+    public function set_option(string $option, mixed $value): void
     {
         $this->pdf->getDomPDF()->set_option($option, $value);
     }
 
-    public function setPaper($type, $direction)
+    public function setPaper(string $type, string $direction): void
     {
         $this->pdf->setPaper($type, $direction);
     }
 
-    public function download($filename)
+    public function download(string $filename): Response
     {
         return $this->pdf->download($filename . '.pdf');
     }
 
-    public function showFile($name = '')
+    public function showFile(string $name = ''): StreamedResponse|Response
     {
         return $this->pdf->stream($name);
     }
 
-    public function save($filename, $path = null)
+    public function save(string $filename, ?string $path = null): SavedFile
     {
         $path = $path ?: pathTemp() . '/' . $filename . '_' . uniqid('', true) . '.pdf';
 
@@ -56,6 +57,7 @@ class PdfHelper
         $savedFile->extension = 'pdf';
         $savedFile->path = $path;
         $savedFile->save();
+
         return $savedFile;
     }
 }

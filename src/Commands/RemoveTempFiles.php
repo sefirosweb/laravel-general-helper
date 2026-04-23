@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sefirosweb\LaravelGeneralHelper\Commands;
 
-use App\Models\User;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -25,42 +24,41 @@ class RemoveTempFiles extends Command
      */
     protected $description = 'Remove files in temp storage path';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
         collect(File::files(pathTemp()))->map(function ($file) {
             return [
                 'file' => $file,
-                'time' => $file->getCTime(),
-                'basename' => pathinfo($file)['filename']
+                // Use mtime rather than ctime. On Linux, ctime tracks inode
+                // metadata changes (permissions, ownership) and is not
+                // backdateable via touch(); mtime is the conventional "how
+                // old is this file" signal and is what we actually want.
+                'time' => $file->getMTime(),
+                // SplFileInfo::getBasename(suffix) returns the filename with
+                // the suffix stripped. PHP 8 pathinfo() rejects SplFileInfo
+                // because of its typed string parameter.
+                'basename' => $file->getBasename('.' . $file->getExtension()),
             ];
         })->filter(function ($file) {
-            if (config('app.env') === 'local') return true;
-            return (time() - $file['time']) / 60 / 60 / 24 > 7; // Deletete after 7 days
+            if (config('app.env') === 'local') {
+                return true;
+            }
+            return (time() - $file['time']) / 60 / 60 / 24 > 7; // Delete files older than 7 days.
         })->each(function ($file) {
             try {
-                unlink($file['file']);
+                // $file['file'] is a SplFileInfo; PHP 8 unlink() rejects it
+                // because of its typed string parameter, so ask for the path
+                // explicitly.
+                unlink($file['file']->getPathname());
                 if (config('app.env') === 'local') {
-                    echo "Deleting: " . $file['basename'] . PHP_EOL;
+                    $this->line('Deleting: ' . $file['basename']);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
+                // Silently ignore individual unlink failures so one stale
+                // handle does not break the whole purge.
             }
         });
 
-        return 0;
+        return self::SUCCESS;
     }
 }
