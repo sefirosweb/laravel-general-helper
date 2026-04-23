@@ -8,6 +8,11 @@
             "Sefirosweb\\LaravelGeneralHelper\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Sefirosweb\\LaravelGeneralHelper\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Sefirosweb",
@@ -16,8 +21,17 @@
     ],
     "minimum-stability": "dev",
     "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
         "phpoffice/phpspreadsheet": "^1.28",
-        "barryvdh/laravel-dompdf": "^2.0.1"
+        "barryvdh/laravel-dompdf": "^3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     },
     "extra": {
         "laravel": {

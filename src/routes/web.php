@@ -1,11 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Sefirosweb\LaravelGeneralHelper\Http\Controllers\FileController;
 
-Route::group([
-    'namespace' => 'Sefirosweb\LaravelGeneralHelper\Http\Controllers'
-], function () {
-
-    Route::get('download_file/{savedFile}', 'FileController@download_file');
-    Route::get('show_file/{savedFile}', 'FileController@show_file');
-});
+Route::get('download_file/{savedFile}', [FileController::class, 'download_file']);
+Route::get('show_file/{savedFile}', [FileController::class, 'show_file']);

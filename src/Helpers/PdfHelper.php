@@ -2,12 +2,15 @@
 
 namespace Sefirosweb\LaravelGeneralHelper\Helpers;
 
+use Barryvdh\DomPDF\PDF as DomPdfWrapper;
 use Exception;
 use Sefirosweb\LaravelGeneralHelper\Http\Models\SavedFile;
 use Illuminate\Support\Facades\Auth;
 
 class PdfHelper
 {
+    protected DomPdfWrapper $pdf;
+
     public function __construct()
     {
         $this->pdf = app('dompdf.wrapper');
